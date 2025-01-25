@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question Generator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Question Generator</h1>
+        <label for="topic">Enter a Topic:</label>
+        <input type="text" id="topic" name="topic" placeholder="Enter a topic">
+        <button id="generate-btn">Generate Questions</button>
+        
+        <div id="question-list">
+            <!-- Generated questions will appear here -->
+        </div>
+    </div>
+
+    <footer>
+        <p>Designed by <a href="https://github.com/rahul-devrani" target="_blank">Rahul</a></p>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $('#generate-btn').click(function() {
+            var topic = $('#topic').val();
+            if(topic) {
+                $.post('/generate', {topic: topic}, function(response) {
+                    var questionList = $('#question-list');
+                    questionList.empty();  // Clear any previous questions
+                    if(response.questions && response.questions.length > 0) {
+                        response.questions.forEach(function(question, index) {
+                            questionList.append('<p>Q' + (index + 1) + ': ' + question + '</p>');
+                        });
+                    } else {
+                        questionList.append('<p>Error: No questions generated.</p>');
+                    }
+                });
+            } else {
+                alert("Please enter a topic.");
+            }
+        });
+    </script>
+</body>
+</html>
