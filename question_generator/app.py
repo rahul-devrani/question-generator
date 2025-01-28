@@ -7,31 +7,30 @@ from spacy.cli import download
 
 app = Flask(__name__)
 
-# Step 1: Check if the model is downloaded, if not, download it
+# step 1: load model
 try:
     nlp = spacy.load('en_core_web_sm')
 except OSError:
     download('en_core_web_sm')
     nlp = spacy.load('en_core_web_sm')
 
-# Step 2: Function to scrape content from a Wikipedia page
+# step 2: Function to scrape content from a Wikipedia 
 def scrape_content(topic):
     try:
-        # Replace spaces with underscores for Wikipedia URL
+        
         url = f"https://en.wikipedia.org/wiki/{topic.replace(' ', '_')}"
         response = requests.get(url)
         soup = BeautifulSoup(response.text, 'html.parser')
         
-        # Find the first few paragraphs in the Wikipedia page
         content = ""
-        for paragraph in soup.find_all('p', limit=3):  # Grabbing up to 3 paragraphs
+        for paragraph in soup.find_all('p', limit=3):  
             content += paragraph.get_text()
         
         return content
     except Exception as e:
         return f"Error scraping content: {str(e)}"
 
-# Step 3: Define a function to generate questions
+# step 3: function to generate questions
 def generate_questions(text):
     doc = nlp(text)
     questions = []
@@ -74,12 +73,12 @@ def generate_questions(text):
     
     return questions[:15] if len(questions) >= 10 else questions + ['Not enough content to generate 10 questions.']
 
-# Flask route for home page
+# home page
 @app.route('/')
 def home():
     return render_template('index.html')
 
-# Flask route to generate questions
+# generate questions
 @app.route('/generate', methods=['POST'])
 def generate():
     topic = request.form.get('topic')
